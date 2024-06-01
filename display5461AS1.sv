@@ -15,8 +15,19 @@ hex27segs h27s(
     .segments( segs )
 );
 
+always @(*) begin
+    case (digits)
+        4'b0001: begin hex = hexx[3:0];   segments = { segs, points[0] }; end
+        4'b0010: begin hex = hexx[7:4];   segments = { segs, points[1] }; end
+        4'b0100: begin hex = hexx[11:8];  segments = { segs, points[2] }; end
+        4'b1000: begin hex = hexx[15:12]; segments = { segs, points[3] }; end
+        default: segments = 8'b0;
+    endcase
+end
+
 reg [14:0] pwm_counter;
 reg turn_on;
+reg [3:0] digits_next;
 
 integer i;
 always @(*) begin
@@ -29,17 +40,16 @@ end
 always @(posedge clk) begin
     pwm_counter <= pwm_counter + 1;
     if (en && turn_on) begin
-        segments[7:1] <= segs;
-        digits <= {digits[2:0], digits[3]};
-        case (digits)
-            4'b0001: begin hex <= hexx[11:8]; segments[0] <= points[1]; end
-            4'b0010: begin hex <= hexx[15:12]; segments[0] <= points[2]; end
-            4'b0100: begin hex <= hexx[3:0]; segments[0] <= points[3]; end
-            4'b1000: begin hex <= hexx[7:4]; segments[0] <= points[0]; end
-            default: digits <= 4'b1000;
+        digits_next <= { digits_next[2:0], digits_next[3] };
+        case (digits_next)
+            4'b0001: digits <= digits_next;
+            4'b0010: digits <= digits_next;
+            4'b0100: digits <= digits_next;
+            4'b1000: digits <= digits_next;
+            default: digits_next <= 4'b0001;
         endcase
     end
-    else segments <= 8'b0;
+    else digits <= 4'b0;
 end
 
 endmodule
