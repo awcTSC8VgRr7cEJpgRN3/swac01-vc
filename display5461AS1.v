@@ -28,16 +28,13 @@ always @(*) begin
     endcase
 end
 
-reg [14:0] pwm_counter;
+reg [15:0] pwm_counter;
 reg turn_on;
 reg [3:0] digits_next;
 
-integer i;
 always @(*) begin
-    turn_on = 1'b1;
-    for ( i = 1; i <= 15 - luminance; i = i + 1 ) begin
-        turn_on = turn_on & pwm_counter[ i - 1 ];
-    end
+    if (luminance == 4'd15) turn_on = 1'b1;
+    else turn_on = &( pwm_counter | ~( ( 16'b1 << (15 - luminance) ) - 16'b1 ) );
 end
 
 always @(posedge clk) begin
