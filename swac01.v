@@ -8,9 +8,7 @@ module swac01 (
 );
 
 reg [10:0] clk_counter;
-wire [3:0] test1;
 wire [15:0] test2;
-wire [3:0] test3;
 wire [11:0] test4;
 
 always @(posedge gclk) begin
@@ -21,9 +19,9 @@ display5461AS1 disp (
     .clk( clk_counter[7] ),
     .en( 1'b1 ),
     .luminance( 4'd11 ),
-    .mask( test1 ),
+    .mask( 4'b1000 ),
     .hexx( test2 ),
-    .points( test3 ),
+    .points( 4'b1000 ),
     .segments( segments ),
     .digits( digits )
 );
