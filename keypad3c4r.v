@@ -14,9 +14,9 @@ reg [11:0] state_prev; // `#`, `*`, 9 to 0
 
 always @(posedge clk) begin
     if (en) begin
-        keypadr <= { keypadr[2:0], keypadr[3] };
-        case (keypadr)
-            4'b0001: begin
+        casez (keypadr)
+            4'b???1: begin
+                keypadr <= 4'b0010;
                 state_prev[3:1] <= keypadc;
                 if (keypadc == state_prev[3:1]) begin
                     if (debounce_level == debounce_level_target - 6'd1) begin
@@ -27,7 +27,8 @@ always @(posedge clk) begin
                 end
                 else debounce_level <= 6'd0;
             end
-            4'b0010: begin
+            4'b??1?: begin
+                keypadr <= 4'b0100;
                 state_prev[6:4] <= keypadc;
                 if (keypadc == state_prev[6:4]) begin
                     if (debounce_level == debounce_level_target - 6'd1) begin
@@ -38,7 +39,8 @@ always @(posedge clk) begin
                 end
                 else debounce_level <= 6'd0;
             end
-            4'b0100: begin
+            4'b?1??: begin
+                keypadr <= 4'b1000;
                 state_prev[9:7] <= keypadc;
                 if (keypadc == state_prev[9:7]) begin
                     if (debounce_level == debounce_level_target - 6'd1) begin
@@ -49,7 +51,8 @@ always @(posedge clk) begin
                 end
                 else debounce_level <= 6'd0;
             end
-            4'b1000: begin
+            4'b1???: begin
+                keypadr <= 4'b0001;
                 { state_prev[11], state_prev[0], state_prev[10] } <= keypadc;
                 if (keypadc == { state_prev[11], state_prev[0], state_prev[10] }) begin
                     if (debounce_level == debounce_level_target - 6'd1) begin
