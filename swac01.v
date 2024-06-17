@@ -7,14 +7,16 @@ module swac01 (
     output [3:0] digits
 );
 
+parameter clk_freq = 22'd3_999_999;
 // reg [0:0] state = 1'b1; // { countdown }
-reg [17:0] clk_counter;
+reg [21:0] clk_counter;
 wire [6:0] minute;
 wire [5:0] second;
 wire [15:0] hexx;
 
 always @(posedge gclk) begin
-    clk_counter <= clk_counter + 1;
+    if (clk_counter == clk_freq) clk_counter <= 22'd0;
+    else clk_counter <= clk_counter + 22'd1;
 end
 
 num2decs num2decs_min (
@@ -27,9 +29,19 @@ num2decs num2decs_sec (
     .decimals( hexx[7:0] )
 );
 
+/*
 clock clock01 (
     .clk( gclk ),
     .pause( 1'b0 ),
+    .load( 1'b0 ),
+    .load_minute( 7'd0 ),
+    .minute( minute ),
+    .second( second )
+);
+*/
+
+clock clock02 (
+    .clk( clk_counter[21] ),
     .load( 1'b0 ),
     .load_minute( 7'd0 ),
     .minute( minute ),
@@ -40,7 +52,6 @@ display5461AS1 disp (
     .clk( clk_counter[7] ),
     .en( 1'b1 ),
     .luminance( 4'd11 ),
-    .show_a2f( 4'b0 ),
     .hexx( hexx ),
     .points( 4'b0100 ),
     .segments( segments ),
