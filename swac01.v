@@ -1,28 +1,48 @@
 module swac01 (
     input gclk, // 4M Hz.
     input [2:0] keypadc,
-    output switch,
+    output reg switch,
     output [3:0] keypadr,
     output [7:0] segments,
     output [3:0] digits
 );
 
+// reg [0:0] state = 1'b1; // { countdown }
 reg [17:0] clk_counter;
-wire [15:0] test2;
-wire [3:0] test3;
-wire [11:0] test4;
+wire [6:0] minute;
+wire [5:0] second;
+wire [15:0] hexx;
 
 always @(posedge gclk) begin
     clk_counter <= clk_counter + 1;
 end
 
+num2decs num2decs_min (
+    .number( minute ),
+    .decimals( hexx[15:8] )
+);
+
+num2decs num2decs_sec (
+    .number( second ),
+    .decimals( hexx[7:0] )
+);
+
+clock clock01 (
+    .clk( gclk ),
+    .pause( 1'b0 ),
+    .load( 1'b0 ),
+    .load_minute( 7'd0 ),
+    .minute( minute ),
+    .second( second )
+);
+
 display5461AS1 disp (
     .clk( clk_counter[7] ),
     .en( 1'b1 ),
     .luminance( 4'd11 ),
-    .show_a2f( 4'b0111 ),
-    .hexx( test2 ),
-    .points( 4'b1000 ),
+    .show_a2f( 4'b0 ),
+    .hexx( hexx ),
+    .points( 4'b0100 ),
     .segments( segments ),
     .digits( digits )
 );
@@ -46,8 +66,5 @@ keypad3c4r keypad (
     .keypadr( keypadr ),
     .key( test3 )
 );
-
-// assign test2 = { 4'b0, test4 };
-assign test2 = { 4{ test3 } };
 
 endmodule
