@@ -42,8 +42,8 @@ clock clock01 (
 
 clock clock02 (
     .clk( clk_counter[21] ),
-    .load( 1'b0 ),
-    .load_minute( 7'd0 ),
+    .load( 1'b1 ),
+    .load_minute( 7'd1 ),
     .minute( minute ),
     .second( second )
 );
