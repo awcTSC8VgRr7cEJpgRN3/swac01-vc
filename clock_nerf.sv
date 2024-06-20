@@ -1,25 +1,28 @@
 module clock (
     input clk, // 1 Hz per sec.
     input load,
-    input [7:0] load_minute,
-    output reg [15:0] min_sec
+    output [15:0] min_sec
 );
 
-parameter max = 12'h959;
-integer i;
+parameter sec_in_min = 6'd59;
+reg [5:0] minute;
+reg [5:0] second;
 
-always @(posedge clk, posedge load) begin
+assign min_sec[15:12] = minute / 10;
+assign min_sec[11:8] = minute - min_sec[15:12];
+assign min_sec[7:4] = second / 10;
+assign min_sec[3:0] = second - min_sec[7:4];
+
+always @(posedge clk) begin
     if (load) begin
-        min_sec[15:8] <= load_minute;
+        minute <= minute + 1;
     end
-    else begin
-        for ( i = 0; i < 16; i = i + 4 ) begin
-            if ( { min_sec[i+3], min_sec[i+2], min_sec[i+1], min_sec[i] } ) break;
-        end
-        if ( i != 16 ) begin
-            // min_sec <= ( ( (min_sec >> i) - 1 ) << i ) | ( ( max << (16-i) ) >> (16-i) );
-            min_sec <= ( ( (min_sec >> i) - 1 ) << i ) | ( ( max << (16-i) ) >> (16-i) );
-        end
+    else if (second) begin
+        second <= second - 1;
+    end
+    else if (minute) begin
+        second <= sec_in_min;
+        minute <= minute - 1;
     end
 end
 

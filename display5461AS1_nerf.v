@@ -14,28 +14,32 @@ dec27segs d27s (
 );
 
 always @(*) begin
+    segments[7:1] = segs;
     casez (digits)
-        4'b???1: begin dec = decs[3:0];   segments = { segs, points[0] }; end
-        4'b??1?: begin dec = decs[7:4];   segments = { segs, points[1] }; end
-        4'b?1??: begin dec = decs[11:8];  segments = { segs, points[2] }; end
-        4'b1???: begin dec = decs[15:12]; segments = { segs, points[3] }; end
-        default: segments = 8'b0;
+        4'b???1: begin dec = decs[3:0];   segments[0] = points[0]; end
+        4'b??1?: begin dec = decs[7:4];   segments[0] = points[1]; end
+        4'b?1??: begin dec = decs[11:8];  segments[0] = points[2]; end
+        4'b1???: begin dec = decs[15:12]; segments[0] = points[3]; end
+        default: begin dec = 4'hf;        segments[0] = 1'b0;      end
     endcase
 end
 
-reg [3:0] pwm_counter;
-reg [3:0] digits_next;
+// reg [3:0] pwm_counter;
+// reg [3:0] digits_next;
 
 always @(posedge clk) begin
-    pwm_counter <= pwm_counter + 1;
-    if (&pwm_counter) begin // magic `turn_on`.
+//  pwm_counter <= pwm_counter + 1;
+//  if (&pwm_counter) begin // magic `turn_on`.
+/*
         digits_next <= { digits_next[2:0], digits_next[3] };
         case (digits_next)
             4'b0001, 4'b0010, 4'b0100, 4'b1000: digits <= digits_next;
             default: digits_next <= 4'b0001;
         endcase
-    end
-    else digits <= 4'b0;
+*/
+        digits <= digits ? { digits[2:0], digits[3] } : /* Init only. */ 4'b0001 /* Init only. */ ;
+//  end
+//  else digits <= 4'b0;
 end
 
 endmodule
